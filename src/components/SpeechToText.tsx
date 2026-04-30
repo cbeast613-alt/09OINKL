@@ -17,6 +17,11 @@ export const SpeechToText: React.FC = () => {
   const [copiedTarget, setCopiedTarget] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleTranscript = useCallback((text: string) => {
     setSourceText(text);
@@ -164,7 +169,7 @@ export const SpeechToText: React.FC = () => {
         </div>
 
         <div className="text-center font-medium text-slate-500 dark:text-slate-400 mb-8 h-6">
-          {isListening ? '🎤 Listening...' : (isTranslating ? '⚙️ Translating...' : 'Click to start speaking')}
+          {!isMounted ? '...' : (isListening ? '🎤 Listening...' : (isTranslating ? '⚙️ Translating...' : 'Click to start speaking'))}
         </div>
 
         {/* Text Areas */}

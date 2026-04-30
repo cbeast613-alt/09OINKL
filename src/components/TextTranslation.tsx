@@ -17,6 +17,11 @@ export const TextTranslation: React.FC = () => {
   const [copiedSource, setCopiedSource] = useState(false);
   const [copiedTarget, setCopiedTarget] = useState(false);
   const [activeTab, setActiveTab] = useState<'simple' | 'formal'>('simple');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const displayedTranslation = activeTab === 'simple' ? simpleTranslation : formalTranslation;
 

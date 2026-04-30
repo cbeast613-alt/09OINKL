@@ -8,8 +8,13 @@ import { motion } from 'framer-motion';
 
 export const SessionHistory: React.FC = () => {
   const { history, clearHistory } = useTranslationStore();
+  const [isMounted, setIsMounted] = React.useState(false);
 
-  if (history.length === 0) return null;
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted || history.length === 0) return null;
 
   return (
     <motion.div

@@ -9,11 +9,14 @@ import { generateComprehension } from '@/utils/comprehensionHelper';
 // ------------------------------------------------------------------
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const GEMINI_MODELS = [
+  'gemini-2.0-flash-001',
   'gemini-2.0-flash',
+  'gemini-1.5-flash-002',
   'gemini-1.5-flash',
   'gemini-1.5-flash-8b',
+  'gemini-1.5-pro',
 ];
-const REQUEST_TIMEOUT_MS = 5000;
+const REQUEST_TIMEOUT_MS = 10000;
 const MAX_OUTPUT_TOKENS = 2048;
 
 const HINDI_FORMAL_SYSTEM = `You are a professional Hindi translator. Translate the text into a professional, formal tone using ONLY the Roman alphabet (no Devanagari). Maintain all technical words, element names, and scientist names exactly in English. Keep all numbers exact. Return ONLY the translation.`;

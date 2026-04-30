@@ -18,6 +18,11 @@ export const SpeechToSpeech: React.FC = () => {
   const [playbackRate, setPlaybackRate] = useState(0.85);
   const [showSpeedControls, setShowSpeedControls] = useState(false);
   const [copiedTranslation, setCopiedTranslation] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleTranscript = useCallback((text: string) => {
     setSourceText(text);

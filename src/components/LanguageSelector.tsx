@@ -17,8 +17,13 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onCha
   const [search, setSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dynamicLanguages, setDynamicLanguages] = useState<Language[]>(LANGUAGES);
+  const [isMounted, setIsMounted] = useState(false);
 
   const { pinnedLanguages, recentLanguages, togglePinLanguage } = useTranslationStore();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     fetch('/api/languages')
@@ -80,9 +85,9 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onCha
         className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <span className="text-xl">{selectedLang?.flag}</span>
+          <span className="text-xl">{isMounted ? selectedLang?.flag : '🌐'}</span>
           <span className="font-semibold text-slate-800 dark:text-slate-200">
-            {selectedLang?.name}
+            {isMounted ? selectedLang?.name : 'Select Language'}
           </span>
         </div>
         <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
