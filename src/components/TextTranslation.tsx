@@ -36,7 +36,7 @@ export const TextTranslation: React.FC = () => {
   const displayedTranslation = activeTab === 'formal' ? (formalTranslation || simpleTranslation) : (simpleTranslation || formalTranslation);
 
   const handleTranslate = useCallback(async () => {
-    if (!sourceText.trim() || isTranslating || sourceText.length > 500) return;
+    if (!sourceText.trim() || isTranslating || sourceText.length > 5000) return;
     setIsTranslating(true);
     try {
       const response = await fetch('/api/translate', {
@@ -195,12 +195,12 @@ export const TextTranslation: React.FC = () => {
             onChange={(e) => setSourceText(e.target.value)}
             placeholder="Enter text to translate..."
             className={`w-full flex-1 resize-none bg-transparent ${getTextSizeClass(textSizeScale)} text-slate-800 dark:text-slate-100 focus:outline-none placeholder:text-slate-400`}
-            maxLength={500}
+            maxLength={5000}
             spellCheck="false"
           />
           <div className="flex items-center justify-between mt-2">
-            <span className={`text-[10px] sm:text-xs transition-colors ${sourceText.length > 490 ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
-              {sourceText.length} / 500
+            <span className={`text-[10px] sm:text-xs transition-colors ${sourceText.length > 4990 ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
+              {sourceText.length} / 5000
             </span>
             {/* Clear button */}
             {sourceText && (
