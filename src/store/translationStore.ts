@@ -17,6 +17,7 @@ export interface TranslationHistoryItem {
 
 interface TranslationState {
   sourceLang: string;
+  detectedSourceLang: string;
   targetLang: string;
   sourceText: string;
   translatedText: string;
@@ -32,9 +33,11 @@ interface TranslationState {
   pinnedLanguages: string[];
   recentLanguages: string[];
   feedbackText: string;
+  textSizeScale: number;
   
   // Actions
   setSourceLang: (lang: string) => void;
+  setDetectedSourceLang: (lang: string) => void;
   setTargetLang: (lang: string) => void;
   swapLanguages: () => void;
   setSourceText: (text: string) => void;
@@ -54,12 +57,14 @@ interface TranslationState {
   addRecentLanguage: (langCode: string) => void;
   clearSourceText: () => void;
   submitFeedback: (feedback: 'good' | 'too-formal' | 'try-simpler') => void;
+  setTextSizeScale: (scale: number) => void;
 }
 
 export const useTranslationStore = create<TranslationState>()(
   persist(
     (set) => ({
       sourceLang: 'auto',
+      detectedSourceLang: 'en',
       targetLang: 'es',
       sourceText: '',
       translatedText: '',
@@ -75,6 +80,7 @@ export const useTranslationStore = create<TranslationState>()(
       pinnedLanguages: ['en', 'es', 'fr'],
       recentLanguages: [],
       feedbackText: '',
+      textSizeScale: 1, // 0 = xs/sm, 1 = sm/base, 2 = base/lg, 3 = lg/xl
 
       setSourceLang: (lang) => set((state) => {
         // Inline addRecentLanguage logic — avoids calling set() inside set()
@@ -82,9 +88,11 @@ export const useTranslationStore = create<TranslationState>()(
         const filtered = state.recentLanguages.filter((c) => c !== lang);
         return {
           sourceLang: lang,
+          detectedSourceLang: lang,
           recentLanguages: [lang, ...filtered].slice(0, 5),
         };
       }),
+      setDetectedSourceLang: (lang) => set({ detectedSourceLang: lang }),
       setTargetLang: (lang) => set((state) => {
         const filtered = state.recentLanguages.filter((c) => c !== lang);
         return {
@@ -180,12 +188,17 @@ export const useTranslationStore = create<TranslationState>()(
             feedbackText: `[${timestamp}] ${feedback}`,
           };
         }),
+
+      setTextSizeScale: (scale) => set({ textSizeScale: scale }),
     }),
     {
       name: 'linguaflow-storage',
       partialize: (state) => ({
         pinnedLanguages: state.pinnedLanguages,
         recentLanguages: state.recentLanguages,
+        textSizeScale: state.textSizeScale,
+        sourceLang: state.sourceLang,
+        targetLang: state.targetLang,
       }),
     }
   )

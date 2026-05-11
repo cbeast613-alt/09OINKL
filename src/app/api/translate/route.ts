@@ -269,6 +269,21 @@ async function googleRomanize(text: string, lang: string): Promise<string> {
   } catch { return ''; }
 }
 
+async function detectLanguage(text: string): Promise<string> {
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return 'en';
+    const buf = await res.arrayBuffer();
+    const raw = new TextDecoder('utf-8').decode(buf);
+    const data = JSON.parse(raw);
+    // Google Translate returns detected language in data[2]
+    const detectedLang = data[2] || 'en';
+    return detectedLang === 'auto' ? 'en' : detectedLang;
+  } catch { return 'en'; }
+}
+
+
 // Hinglish fixes
 function applyHinglishFixes(text: string): string {
   const fixes: Record<string, string> = {
@@ -599,11 +614,17 @@ export async function POST(request: Request) {
     const { text, sourceLang, targetLang } = parsed.data;
     const targetLangName = getLangName(targetLang);
 
+    // Detect actual source language if set to auto
+    let detectedSourceLang = sourceLang;
+    if (sourceLang === 'auto') {
+      detectedSourceLang = await detectLanguage(text);
+    }
+
     const processedText = text.replace(/(\d+)\.(\d+)/g, '$1_FIXED_DOT_$2').replace(/\[\d+\]/g, '');
 
     try {
       console.log(`[Translate] ${processedText.length} chars → ${targetLangName}(${targetLang})`);
-      const result = await translateWithGemini(processedText, targetLangName, targetLang, sourceLang);
+      const result = await translateWithGemini(processedText, targetLangName, targetLang, detectedSourceLang);
 
       const simple = postProcess(result.simple, targetLang, false);
       const formal = postProcess(result.formal, targetLang, true);
@@ -624,7 +645,7 @@ export async function POST(request: Request) {
         formality: 'Easy',
         difficulty,
         confidence: 1.0,
-        sourceLang,
+        sourceLang: detectedSourceLang,
         targetLang,
         engine: result.engine,
       });
@@ -633,7 +654,7 @@ export async function POST(request: Request) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.warn(`[Translate] All engines failed(${errorMessage}), trying MyMemory…`);
       const { runTranslationPipeline } = await import('@/utils/translationPipeline');
-      const normalizedSource = sourceLang === 'auto' ? 'Autodetect' : sourceLang;
+      const normalizedSource = detectedSourceLang === 'auto' ? 'Autodetect' : detectedSourceLang;
       const pipeline = await runTranslationPipeline(text, normalizedSource, targetLang);
 
       let simpleFallback = pipeline.simpleTranslation;
@@ -659,7 +680,7 @@ export async function POST(request: Request) {
         formality: pipeline.formality,
         difficulty: pipeline.difficulty,
         confidence: pipeline.confidence,
-        sourceLang,
+        sourceLang: detectedSourceLang,
         targetLang,
         engine: 'mymemory-fallback',
       });

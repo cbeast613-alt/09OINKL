@@ -376,15 +376,16 @@ function fixArabic(text: string): string {
 }
 
 function fixFrench(text: string): string {
-  const fixes: Record<string, string> = {
-    "vous": "tu",
-    "votre": "ton/ta",
-    "avez-vous": "t'as",
-    "comprenez-vous": "tu comprends",
-    "Comment vous": "Comment tu",
-  };
-  Object.entries(fixes).forEach(([wrong, right]) => {
-    text = text.replaceAll(wrong, right);
+  // Word-boundary replacements only — avoids corrupting "vous-même", "trouvez", etc.
+  const fixes: [RegExp, string][] = [
+    [/\bvous\b/g, 'tu'],
+    [/\bvotre\b/g, 'ton/ta'],
+    [/\bavez-vous\b/g, "t'as"],
+    [/\bcomprenez-vous\b/g, 'tu comprends'],
+    [/\bComment vous\b/g, 'Comment tu'],
+  ];
+  fixes.forEach(([pattern, replacement]) => {
+    text = text.replace(pattern, replacement);
   });
   return fixSentenceFlow(text);
 }
@@ -437,14 +438,15 @@ function fixJapanese(text: string): string {
 }
 
 function fixGerman(text: string): string {
-  const fixes: Record<string, string> = {
-    "Sie": "du",
-    "Ihr": "dein",
-    "Ihnen": "dir",
-    "Wie geht es Ihnen": "Wie geht's",
-  };
-  Object.entries(fixes).forEach(([wrong, right]) => {
-    text = text.replaceAll(wrong, right);
+  // Word-boundary replacements only — avoids corrupting "Sieden", "Sieg", "sieben", etc.
+  const fixes: [RegExp, string][] = [
+    [/\bSie\b/g, 'du'],
+    [/\bIhr\b/g, 'dein'],
+    [/\bIhnen\b/g, 'dir'],
+    [/\bWie geht es Ihnen\b/g, "Wie geht's"],
+  ];
+  fixes.forEach(([pattern, replacement]) => {
+    text = text.replace(pattern, replacement);
   });
   return fixSentenceFlow(text);
 }

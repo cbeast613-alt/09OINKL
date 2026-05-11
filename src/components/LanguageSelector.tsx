@@ -10,9 +10,12 @@ interface LanguageSelectorProps {
   value: string;
   onChange: (code: string) => void;
   isSource?: boolean;
+  align?: 'left' | 'right';
+  label?: string;
+  ariaLabel?: string;
 }
 
-export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onChange, isSource = false }) => {
+export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onChange, isSource = false, align = 'left', label, ariaLabel }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,26 +32,33 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onCha
     fetch('/api/languages')
       .then(res => res.json())
       .then((data: Record<string, string>) => {
-        const backendLangs = Object.entries(data).map(([code, name]) => {
+        // Merge API names with rich static data — static data always wins for flag/nativeName
+        const merged = Object.entries(data).map(([code, apiName]) => {
           const existing = LANGUAGES.find(l => l.code === code);
           return {
             code,
-            name,
-            flag: existing?.flag || '🌐',
+            name: existing?.name || apiName,          // prefer static name (already correct)
+            flag: existing?.flag || '🌐',              // always use static flag emoji
             nativeName: existing?.nativeName || '',
-            tier: existing?.tier || 3,
+            tier: existing?.tier || (3 as const),
             supportsSpeech: existing?.supportsSpeech || false,
             supportsTTS: existing?.supportsTTS || false,
           };
         });
-        backendLangs.sort((a, b) => a.name.localeCompare(b.name));
-        setDynamicLanguages(backendLangs);
+        // Add any static languages that the API didn't return
+        LANGUAGES.forEach(l => {
+          if (!merged.find(m => m.code === l.code)) merged.push({ ...l });
+        });
+        merged.sort((a, b) => a.name.localeCompare(b.name));
+        setDynamicLanguages(merged);
       })
-      .catch(err => console.error("Failed to fetch languages", err));
+      .catch(() => {
+        // API failed — silently keep the static LANGUAGES list
+      });
   }, []);
 
   const selectedLang = value === 'auto' 
-    ? { code: 'auto', name: 'Detect Language', flag: '✨', nativeName: '' } as Language
+    ? { code: 'auto', name: 'Auto-detect', flag: '✨', nativeName: '' } as Language
     : dynamicLanguages.find(l => l.code === value) || getLanguageByCode(value) || { code: value, name: value, flag: '🌐', nativeName: '' } as Language;
 
   useEffect(() => {
@@ -79,18 +89,20 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onCha
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative w-full" ref={dropdownRef}>
+      {label && <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1 px-1">{label}</label>}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={ariaLabel || 'Select language'}
         className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-xl">{isMounted ? selectedLang?.flag : '🌐'}</span>
-          <span className="font-semibold text-slate-800 dark:text-slate-200">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-xl flex-shrink-0">{isMounted ? selectedLang?.flag : '🌐'}</span>
+          <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
             {isMounted ? selectedLang?.name : 'Select Language'}
           </span>
         </div>
-        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <AnimatePresence>
@@ -99,7 +111,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onCha
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute z-50 w-64 md:w-80 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden"
+            className={`absolute z-50 w-64 md:w-80 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}
           >
             <div className="p-2 border-b border-slate-100 dark:border-slate-800">
               <div className="relative">
@@ -118,7 +130,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onCha
             <div className="max-h-80 overflow-y-auto p-2 scrollbar-thin">
               {isSource && search === '' && (
                 <LanguageOption
-                  lang={{ code: 'auto', name: 'Detect Language', flag: '✨', nativeName: '', tier: 1, supportsSpeech: false, supportsTTS: false }}
+                  lang={{ code: 'auto', name: 'Auto-detect', flag: '✨', nativeName: '', tier: 1, supportsSpeech: false, supportsTTS: false }}
                   isSelected={value === 'auto'}
                   onSelect={() => handleSelect('auto')}
                 />

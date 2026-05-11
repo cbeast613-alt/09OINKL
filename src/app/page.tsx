@@ -6,6 +6,7 @@ import { TextTranslation } from '../components/TextTranslation';
 import { SpeechToText } from '../components/SpeechToText';
 import { SpeechToSpeech } from '../components/SpeechToSpeech';
 import { SessionHistory } from '../components/SessionHistory';
+import { FAQ } from '../components/FAQ';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
@@ -58,6 +59,7 @@ export default function Home() {
         </AnimatePresence>
 
         <SessionHistory />
+        <FAQ />
       </div>
     </main>
   );

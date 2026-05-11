@@ -13,9 +13,9 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ mode, onModeChange }) => {
   const modes = [
-    { id: 'text' as const, label: 'Text', icon: Type },
-    { id: 'speech-to-text' as const, label: 'Voice to Text', icon: Mic },
-    { id: 'speech-to-speech' as const, label: 'Voice to Voice', icon: Languages },
+    { id: 'text' as const, label: 'Text', icon: Type, subtitle: '' },
+    { id: 'speech-to-text' as const, label: 'Voice to Text', icon: Mic, subtitle: 'Speak and get a text translation' },
+    { id: 'speech-to-speech' as const, label: 'Voice to Voice', icon: Languages, subtitle: 'Speak and hear the translation aloud' },
   ];
 
   return (
@@ -50,8 +50,15 @@ export const Header: React.FC<HeaderProps> = ({ mode, onModeChange }) => {
                   />
                 )}
                 <span className="relative z-10 flex items-center gap-2">
-                  <Icon className="w-4 h-4" />
-                  <span className="inline text-[10px] sm:text-sm">{m.label}</span>
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <div className="flex flex-col items-start">
+                    <span className="inline text-[10px] sm:text-sm font-bold">{m.label}</span>
+                    {m.subtitle && (
+                      <span className="hidden md:block text-[9px] text-slate-500 dark:text-slate-400 font-normal leading-none mt-0.5">
+                        {m.subtitle}
+                      </span>
+                    )}
+                  </div>
                 </span>
               </button>
             );

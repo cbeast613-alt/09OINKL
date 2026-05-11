@@ -1,0 +1,23 @@
+﻿<USER_REQUEST>
+Here are all 26 tasks. Fix them one by one. Start with Task 1.
+
+PROJECT: LinguaFlow â€” a translation web app at https://linguaflow-delta.vercel.app/
+Read the codebase first, then fix each task below in order.
+
+--- CRITICAL (fix first) ---
+
+TASK 1: Create /privacy-policy page
+Content: what data is collected, how voice data is handled, which translation API is used, no data is stored. Add a Privacy Policy link in the footer.
+
+TASK 2: Create /terms page
+Content: acceptable use, no warranty, liability disclaimer. Add a Terms of Service link in the footer.
+
+TASK 3: Fix language selector labels
+- First dropdown label â†’ "Translate from" + aria-label="Select source language"
+- Second dropdown label â†’ "Translate to" + aria-label="Select target language"
+
+TASK 4: Voice features error handling
+- Mic denied â†’ show: "Microphone access denied â€” allow it in browser settings and refresh."
+- Browser unsupported â†’ show: "Voice input not supported. Try Chrome or Edge."
+
+<truncated 5536 bytes>
