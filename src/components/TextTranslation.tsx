@@ -19,7 +19,7 @@ export const TextTranslation: React.FC = () => {
 
   const [copiedSource, setCopiedSource] = useState(false);
   const [copiedTarget, setCopiedTarget] = useState(false);
-  const [activeTab, setActiveTab] = useState<'simple' | 'formal'>('simple');
+  const [activeTab, setActiveTab] = useState<'simple' | 'formal'>('formal');
   const [isMounted, setIsMounted] = useState(false);
   const [speakingTarget, setSpeakingTarget] = useState<'source' | 'translation' | null>(null);
 
@@ -244,6 +244,7 @@ export const TextTranslation: React.FC = () => {
               <div className="flex bg-slate-200/50 dark:bg-slate-700/50 rounded-lg p-0.5">
                 <button
                   onClick={() => setActiveTab('simple')}
+                  style={{ display: 'none' }}
                   className={`px-2.5 py-1 text-[10px] sm:text-xs font-medium rounded-md transition-colors ${activeTab === 'simple' ? 'bg-white dark:bg-slate-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                 >
                   Simple
@@ -271,19 +272,6 @@ export const TextTranslation: React.FC = () => {
               <p className={`${getTextSizeClass(textSizeScale)} whitespace-pre-wrap break-words text-red-500 font-medium`}>
                 {displayedTranslation}
               </p>
-            ) : activeTab === 'formal' && formalTranslation && simpleTranslation && formalTranslation !== simpleTranslation ? (
-              <div className={`${getTextSizeClass(textSizeScale)} whitespace-pre-wrap break-words text-slate-800 dark:text-slate-100 leading-relaxed`}>
-                {diffWords(simpleTranslation, formalTranslation).map((part, i) => (
-                  <span
-                    key={i}
-                    className={
-                      part.added ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded px-0.5' :
-                      part.removed ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 line-through rounded px-0.5' :
-                      ''
-                    }
-                  >{part.value}</span>
-                ))}
-              </div>
             ) : (
               <p className={`${getTextSizeClass(textSizeScale)} whitespace-pre-wrap break-words text-slate-800 dark:text-slate-100`}>
                 {!displayedTranslation ? (
