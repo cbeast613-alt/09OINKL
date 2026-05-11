@@ -30,7 +30,18 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "LinguaFlow - Professional Translation",
     description: "Fast, accurate, and professional text and voice translation supporting 30+ languages including regional Indian languages.",
-  }
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+    other: [
+      { rel: 'manifest', url: '/site.webmanifest' },
+    ],
+  },
 };
 
 export default function RootLayout({
